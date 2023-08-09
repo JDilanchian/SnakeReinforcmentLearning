@@ -7,7 +7,13 @@ from common import (SCREEN_WIDTH, SCREEN_HEIGHT, Direction, SNAKE_INITIAL, BOX_S
 pygame.init()
 font = pygame.font.Font('arial.ttf', 25)
 
-class SnakeGame:
+# reset
+# reward
+# play(action) -> direction
+# game_iteration
+# is_collision
+
+class SnakeGameAI:
     
     def __init__(self) -> None:
         self.display = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -34,33 +40,38 @@ class SnakeGame:
         if self.food in self.snake:
             self._place_food
 
-    def play_step(self):
+    def play_step(self, action):
+        self.frame_iteration += 1
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
-            
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT:
-                    self.direction = Direction.LEFT
-                if event.key == pygame.K_RIGHT:
-                    self.direction = Direction.RIGHT
-                if event.key == pygame.K_UP:
-                    self.direction = Direction.UP
-                if event.key == pygame.K_DOWN:
-                    self.direction = Direction.DOWN
-        print(self.direction)
-        self._move(self.direction)
+        
+            # if event.type == pygame.KEYDOWN:
+            #     if event.key == pygame.K_LEFT:
+            #         self.direction = Direction.LEFT
+            #     if event.key == pygame.K_RIGHT:
+            #         self.direction = Direction.RIGHT
+            #     if event.key == pygame.K_UP:
+            #         self.direction = Direction.UP
+            #     if event.key == pygame.K_DOWN:
+            #         self.direction = Direction.DOWN
+        self._move(action)
 
         self.snake.insert(0, self.head)
 
+        reward = 0
         game_over = False
-        if self._is_collision():
+
+        # might need to define head of snake here 15:00 of 2nd video
+        if self.is_collision() or self.frame_iteration > 100 * len(self.snake):
             game_over = True
+            reward = -10
             return game_over, self.score
         
         if self.head == self.food:
             self.score += 1
+            reward = 10
             self._place_food()
         else:
             self.snake.pop()
@@ -68,7 +79,7 @@ class SnakeGame:
         self._update_ui()
         self.clock.tick(SPEED)
 
-        return game_over, self.score
+        return reward, game_over, self.score
 
     def _update_ui(self):
         self.display.fill(BLACK)
@@ -88,7 +99,7 @@ class SnakeGame:
         self.display.blit(text, (0, 0))
         pygame.display.flip()
 
-    def _is_collision(self):
+    def is_collision(self):
         if self.head.x >= SCREEN_WIDTH or \
             self.head.x < 0 or \
             self.head.y >= SCREEN_HEIGHT or \
@@ -103,24 +114,33 @@ class SnakeGame:
 
 
     # in pygame.display.setmode increasing value of y moves the cursur toward bottom  
-    def _move(self, direction):
-        if direction == Direction.LEFT:
+    # the direction changes from snakes point of view. Going down and turn right means going to left of screen
+    def _move(self, action):
+        # [straight, right, left]
+        # No changes in case of [1, 0, 0]
+        clockwise = [Direction.RIGHT, Direction.DOWN, Direction.LEFT, Direction.UP]
+        if action[1]:
+            self.direction = clockwise[(clockwise.index(self.direction) + 1) % 4]
+        elif action[2]:
+            self.direction = clockwise[(clockwise.index(self.direction) - 1) % 4]
+        
+        if self.direction == Direction.LEFT:
             self.head = Point(self.head.x - BOX_SIZE, self.head.y)
-        elif direction == Direction.RIGHT:
+        elif self.direction == Direction.RIGHT:
             self.head = Point(self.head.x + BOX_SIZE, self.head.y)
-        elif direction == Direction.UP:
+        elif self.direction == Direction.UP:
             self.head = Point(self.head.x, self.head.y - BOX_SIZE)
-        elif direction == Direction.DOWN:
+        elif self.direction == Direction.DOWN:
             self.head = Point(self.head.x, self.head.y  + BOX_SIZE)
 
-if __name__ == '__main__':
-    game = SnakeGame()
+# if __name__ == '__main__':
+#     game = SnakeGameAI()
 
-    while True:
-        game_over, score = game.play_step()
+#     while True:
+#         game_over, score = game.play_step()
 
-        if game_over == True:
-            break
+#         if game_over == True:
+#             break
 
-    print('Final Score', score)    
-    pygame.quit()
+#     print('Final Score', score)    
+#     pygame.quit()
