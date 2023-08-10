@@ -63,11 +63,10 @@ class SnakeGameAI:
         reward = 0
         game_over = False
 
-        # might need to define head of snake here 15:00 of 2nd video
         if self.is_collision() or self.frame_iteration > 100 * len(self.snake):
             game_over = True
             reward = -10
-            return game_over, self.score
+            return reward, game_over, self.score
         
         if self.head == self.food:
             self.score += 1
@@ -99,16 +98,16 @@ class SnakeGameAI:
         self.display.blit(text, (0, 0))
         pygame.display.flip()
 
-    def is_collision(self):
-        if self.head.x >= SCREEN_WIDTH or \
-            self.head.x < 0 or \
-            self.head.y >= SCREEN_HEIGHT or \
-            self.head.y < 0 :
-            return True 
-        
-        if self.head in self.snake[1:]:
+    def is_collision(self, pt=None):
+        if pt is None:
+            pt = self.head
+        # hits boundary
+        if pt.x > SCREEN_WIDTH - BOX_SIZE or pt.x < 0 or pt.y > SCREEN_HEIGHT - BOX_SIZE or pt.y < 0:
             return True
-        
+        # hits itself
+        if pt in self.snake[1:]:
+            return True
+
         return False
 
 
