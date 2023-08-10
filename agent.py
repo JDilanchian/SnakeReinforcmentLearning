@@ -5,6 +5,7 @@ import numpy as np
 from snake_game_ai import SnakeGameAI
 from common import (Point, Direction, BOX_SIZE)
 from collections import deque
+from model import Linear_Qnet, QTrainer
 
 MAX_MEMORY = 100_000
 BATH_SIZE = 1000
