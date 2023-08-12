@@ -3,7 +3,7 @@ from collections import namedtuple
 
 Point = namedtuple("Point", ['x', 'y'])
 BOX_SIZE = 20
-SPEED = 40
+SPEED = 1500
 SCREEN_WIDTH = 640
 SCREEN_HEIGHT = 480
 Direction = Enum('Direction', ['UP', 'LEFT', 'DOWN', 'RIGHT'], start = 0)

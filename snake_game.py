@@ -54,13 +54,16 @@ class SnakeGame:
 
         self.snake.insert(0, self.head)
 
+        reward = 0
         game_over = False
-        if self._is_collision():
+        if self.is_collision():
             game_over = True
-            return game_over, self.score
+            reward = -10
+            return reward, game_over, self.score
         
         if self.head == self.food:
             self.score += 1
+            reward = 10
             self._place_food()
         else:
             self.snake.pop()
@@ -68,7 +71,7 @@ class SnakeGame:
         self._update_ui()
         self.clock.tick(SPEED)
 
-        return game_over, self.score
+        return reward, game_over, self.score
 
     def _update_ui(self):
         self.display.fill(BLACK)
@@ -88,17 +91,29 @@ class SnakeGame:
         self.display.blit(text, (0, 0))
         pygame.display.flip()
 
-    def _is_collision(self):
-        if self.head.x >= SCREEN_WIDTH or \
-            self.head.x < 0 or \
-            self.head.y >= SCREEN_HEIGHT or \
-            self.head.y < 0 :
-            return True 
-        
-        if self.head in self.snake[1:]:
+
+    def is_collision(self, pt=None):
+        if pt is None:
+            pt = self.head
+        # hits boundary
+        if pt.x > self.w - BOX_SIZE or pt.x < 0 or pt.y > self.h - BOX_SIZE or pt.y < 0:
             return True
-        
+        # hits itself
+        if pt in self.snake[1:]:
+            return True
+
         return False
+    # def _is_collision(self):
+    #     if self.head.x >= SCREEN_WIDTH or \
+    #         self.head.x < 0 or \
+    #         self.head.y >= SCREEN_HEIGHT or \
+    #         self.head.y < 0 :
+    #         return True 
+        
+    #     if self.head in self.snake[1:]:
+    #         return True
+        
+    #     return False
 
 
 

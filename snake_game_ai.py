@@ -1,5 +1,6 @@
 import pygame
 import random
+import copy
 from enum import Enum
 from collections import namedtuple 
 from common import (SCREEN_WIDTH, SCREEN_HEIGHT, Direction, SNAKE_INITIAL, BOX_SIZE, Point, BLACK, WHITE, RED, BLUE, SPEED)
@@ -23,7 +24,7 @@ class SnakeGameAI:
 
     def reset(self):
         self.direction = Direction.RIGHT
-        self.snake = SNAKE_INITIAL
+        self.snake = copy.deepcopy(SNAKE_INITIAL)
         self.head = self.snake[0]
 
         self.score = 0
